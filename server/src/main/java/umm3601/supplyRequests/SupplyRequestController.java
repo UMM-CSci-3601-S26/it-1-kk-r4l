@@ -191,12 +191,17 @@ public class SupplyRequestController implements Controller {
   public void calculateNeed(Context ctx) {
 
     List<Bson> pipeline = Arrays.asList(
-      // Filter supply requests using any supported query params.
+      // Stage 1: Filter supply requests using any supported query params (school, grade, item, properties).
       Aggregates.match(itemFilter(ctx)),
-      // Filter out supply requests with missing or null item field
+      // Stage 2: Filter out supply requests with missing or null item field.
+      // This ensures we only process valid supply requests that have an item specified.
       new Document("$match", new Document("item", new Document("$exists", true).append("$ne", null))),
-      // Join each supply request to matching students (same school + grade)
-      // and count those matching students.
+      // Stage 3: Perform a $lookup join with the students collection to count matching students.
+      // For each supply request, find students with the same school and grade.
+      // The $let statement creates variables (requestSchool, requestGrade) from the current supply request.
+      // The nested pipeline matches students where both school and grade equal the request's values,
+      // then counts the total number of matching students.
+      // Results are stored in the "studentCounts" array.
       new Document("$lookup", new Document("from", "students")
         .append("let", new Document("requestSchool", "$school").append("requestGrade", "$grade"))
         .append("pipeline", Arrays.asList(
@@ -207,17 +212,23 @@ public class SupplyRequestController implements Controller {
           new Document("$count", "count")
         ))
         .append("as", "studentCounts")),
-      // Extract the number of students in matching school/grade.
+      // Stage 4: Extract the student count from the studentCounts array.
+      // Uses $first to get the count from the first element, defaults to 0 if no matches found.
       new Document("$addFields", new Document("studentCount",
         new Document("$ifNull", Arrays.asList(new Document("$first", "$studentCounts.count"), 0)))),
-      // Compute total amount needed: number of matching students * per-student quantity.
+      // Stage 5: Calculate the total number of items needed.
+      // Multiply the per-student quantity by the number of students in that grade/school.
+      // This gives us the total count of items to purchase for this supply request.
       new Document("$addFields", new Document("count",
         new Document("$multiply", Arrays.asList(
           new Document("$ifNull", Arrays.asList("$quantity", 0)),
           "$studentCount"
         )))),
-      // Output only fields needed by SupplyNeedContribution.
+      // Stage 6: Filter out supply requests where no students match (studentCount = 0).
+      // If there are no students in that grade/school, we don't need to purchase items.
       new Document("$match", new Document("studentCount", new Document("$gt", 0))),
+      // Stage 7: Project only the fields needed by SupplyNeedContribution.
+      // Convert _id to string format and include all relevant fields for the response.
       new Document("$project", new Document("_id", new Document("$toString", "$_id"))
         .append("school", 1)
         .append("grade", 1)
@@ -226,6 +237,7 @@ public class SupplyRequestController implements Controller {
         .append("quantity", 1)
         .append("studentCount", 1)
         .append("count", 1)),
+      // Stage 8: Sort results by item name, then by quantity.
       new Document("$sort", new Document("item", 1).append("quantity", 1))
     );
 
@@ -250,9 +262,17 @@ public class SupplyRequestController implements Controller {
   public void calculateNeedGrouped(Context ctx) {
 
     List<Bson> pipeline = Arrays.asList(
+      // Stage 1: Filter supply requests using any supported query params (school, grade, item, properties).
       Aggregates.match(itemFilter(ctx)),
-      // Filter out supply requests with missing or null item field
+      // Stage 2: Filter out supply requests with missing or null item field.
+      // This ensures we only process valid supply requests that have an item specified.
       new Document("$match", new Document("item", new Document("$exists", true).append("$ne", null))),
+      // Stage 3: Perform a $lookup join with the students collection to count matching students.
+      // For each supply request, find students with the same school and grade.
+      // The $let statement creates variables (requestSchool, requestGrade) from the current supply request.
+      // The nested pipeline matches students where both school and grade equal the request's values,
+      // then counts the total number of matching students.
+      // Results are stored in the "studentCounts" array.
       new Document("$lookup", new Document("from", "students")
         .append("let", new Document("requestSchool", "$school").append("requestGrade", "$grade"))
         .append("pipeline", Arrays.asList(
@@ -263,14 +283,25 @@ public class SupplyRequestController implements Controller {
           new Document("$count", "count")
         ))
         .append("as", "studentCounts")),
+      // Stage 4: Extract the student count from the studentCounts array.
+      // Uses $first to get the count from the first element, defaults to 0 if no matches found.
       new Document("$addFields", new Document("studentCount",
         new Document("$ifNull", Arrays.asList(new Document("$first", "$studentCounts.count"), 0)))),
+      // Stage 5: Calculate the total number of items needed for each supply request.
+      // Multiply the per-student quantity by the number of students in that grade/school.
       new Document("$addFields", new Document("count",
         new Document("$multiply", Arrays.asList(
           new Document("$ifNull", Arrays.asList("$quantity", 0)),
           "$studentCount"
         )))),
+      // Stage 6: Filter out supply requests where no students match (studentCount = 0).
+      // If there are no students in that grade/school, we don't need to include this request.
       new Document("$match", new Document("studentCount", new Document("$gt", 0))),
+      // Stage 7: Group supply requests by their item and properties.
+      // This combines multiple supply requests for the same item/properties combination.
+      // For each group, we:
+      // - Sum the count values to get totalCount (total items needed across all requests)
+      // - Collect all contributing supply requests in an array with their details
       new Document("$group", new Document("_id", new Document("item", "$item")
         .append("properties", "$properties"))
         .append("totalCount", new Document("$sum", "$count"))
@@ -280,6 +311,9 @@ public class SupplyRequestController implements Controller {
           .append("quantity", "$quantity")
           .append("studentCount", "$studentCount")
           .append("count", "$count")))),
+      // Stage 8: Project the final output structure for SupplyNeedGroup.
+      // Move item and properties from _id to top-level fields.
+      // Convert null properties to empty arrays for consistency.
       new Document("$project", new Document("_id", 0)
         .append("item", "$_id.item")
         .append("properties", new Document("$cond", Arrays.asList(
@@ -288,6 +322,8 @@ public class SupplyRequestController implements Controller {
           "$_id.properties")))
         .append("totalCount", 1)
         .append("supplyRequests", 1)),
+      // Stage 9: Sort results by item name, then by totalCount in descending order.
+      // This shows items alphabetically, with highest needs first within each item.
       new Document("$sort", new Document("item", 1).append("totalCount", -1))
     );
 
