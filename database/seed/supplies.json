@@ -1,0 +1,155 @@
+[
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4af7"
+    },
+    "item": "box of markers",
+    "properties": "['crayola', 'wide', 'broad line']",
+    "description": "10 Pack Crayola Markers",
+    "quantity": 30
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4af8"
+    },
+    "item": "folder",
+    "properties": "['blue', 'pocket']",
+    "description": "blue pocket folder",
+    "quantity": 4
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4af9"
+    },
+    "item": "dry erase marker",
+    "properties": "['black', 'Amazon Basics']",
+    "description": "Amazon Basics black dry erase marker",
+    "quantity": 30
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4afa"
+    },
+    "item": "dry erase marker",
+    "properties": "['black', 'expo', 'chisel tip']",
+    "description": "Expo black dry erase marker",
+    "quantity": 12
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4afb"
+    },
+    "item": "dry erase marker",
+    "properties": "['black', 'expo', 'bullet tip']",
+    "description": "Expo black dry erase marker",
+    "quantity": 36
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4afc"
+    },
+    "item": "box of crayons",
+    "properties": "['crayola', '24 count']",
+    "description": "box of 24 Crayola crayons",
+    "quantity": 12
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4afd"
+    },
+    "item": "box of crayons",
+    "properties": "['24 count']",
+    "description": "box of 24 crayons",
+    "quantity": 12
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4afe"
+    },
+    "item": "folder",
+    "properties": "['red', 'plastic', '3 prong']",
+    "description": "red plastic 3 prong folder",
+    "quantity": 10
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4aff"
+    },
+    "item": "pencil",
+    "properties": "['#2', 'Ticonderoga', 'yellow', 'sharpened']",
+    "description": "yellow #2 Ticonderoga pencils (sharpened)",
+    "quantity": 180
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b00"
+    },
+    "item": "pencil",
+    "properties": "['#2', 'yellow', 'sharpened']",
+    "description": "yellow #2 pencils (sharpened)",
+    "quantity": 1000
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b01"
+    },
+    "item": "pencil",
+    "properties": "['#2', 'Ticonderoga', 'yellow']",
+    "description": "yellow #2 Ticonderoga pencils",
+    "quantity": 36
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b02"
+    },
+    "item": "notecards",
+    "properties": "['3x5', '100 count', 'ruled']",
+    "description": "100 pack of notecards (ruled)",
+    "quantity": 6
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b03"
+    },
+    "item": "folder",
+    "properties": "['red', 'plastic', 'pocket']",
+    "description": "red plastic 3 pocket folder",
+    "quantity": 5
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b04"
+    },
+    "item": "box of markers",
+    "properties": "['crayola', 'washable', 'wide']",
+    "description": "10 Pack Markers",
+    "quantity": 3
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b05"
+    },
+    "item": "box of markers",
+    "properties": "['crayola', 'wide', 'broad line']",
+    "description": "10 Pack Washable Crayola Markers",
+    "quantity": 5
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b06"
+    },
+    "item": "folder",
+    "properties": "['blue', 'plastic', 'pocket']",
+    "description": "blue plastic 3 pocket folder",
+    "quantity": 5
+  },
+  {
+    "_id": {
+        "$oid": "69a3c953c3b148a8f00d4b07"
+    },
+    "item": "folder",
+    "properties": "['blue', 'plastic', '3 prong']",
+    "description": "blue plastic 3 prong folder",
+    "quantity": 10
+  }
+]
