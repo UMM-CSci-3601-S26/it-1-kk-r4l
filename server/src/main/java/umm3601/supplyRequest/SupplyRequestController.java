@@ -1,4 +1,4 @@
-package umm3601.supplyRequests;
+package umm3601.supplyRequest;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;

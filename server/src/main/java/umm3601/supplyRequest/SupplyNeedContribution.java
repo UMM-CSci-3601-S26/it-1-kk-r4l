@@ -1,4 +1,4 @@
-package umm3601.supplyRequests;
+package umm3601.supplyRequest;
 
 public class SupplyNeedContribution {
   @SuppressWarnings("checkstyle:membername")
