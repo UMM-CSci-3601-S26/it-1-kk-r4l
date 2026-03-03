@@ -1,5 +1,6 @@
 package umm3601.supplyRequest;
 
+@SuppressWarnings({"VisibilityModifier"})
 public class SupplyNeedContribution {
   @SuppressWarnings("checkstyle:membername")
   public String _id;
