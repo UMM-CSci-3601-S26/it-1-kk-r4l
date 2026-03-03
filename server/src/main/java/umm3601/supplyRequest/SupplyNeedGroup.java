@@ -2,6 +2,7 @@ package umm3601.supplyRequest;
 
 import java.util.List;
 
+@SuppressWarnings({"VisibilityModifier"})
 public class SupplyNeedGroup {
   public String item;
   public String[] properties;

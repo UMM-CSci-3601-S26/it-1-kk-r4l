@@ -133,7 +133,8 @@ public class SupplyRequestController implements Controller {
     }
     if (ctx.queryParamMap().containsKey(GRADE_KEY)) {
       String grade = ctx.queryParamAsClass(GRADE_KEY, String.class)
-        .check(it -> it.matches(GRADE_REGEX), "To find a supply request associated with a grade, use a valid grade option")
+        .check(it -> it.matches(GRADE_REGEX),
+        "To find a supply request associated with a grade, use a valid grade option")
         .get();
       filters.add(eq(GRADE_KEY, grade));
     }
@@ -359,7 +360,8 @@ public class SupplyRequestController implements Controller {
     }
     if (ctx.queryParamMap().containsKey(GRADE_KEY)) {
       String grade = ctx.queryParamAsClass(GRADE_KEY, String.class)
-        .check(it -> it.matches(GRADE_REGEX), "To find a supply request associated with a grade, use a valid grade option")
+        .check(it -> it.matches(GRADE_REGEX),
+        "To find a supply request associated with a grade, use a valid grade option")
         .get();
       filters.add(eq(GRADE_KEY, grade));
     }
