@@ -69,6 +69,9 @@ class SupplyRequestControllerSpec {
   @Captor
   private ArgumentCaptor<ArrayList<SupplyNeedGroup>> supplyNeedGroupCaptor;
 
+  @Captor
+  private ArgumentCaptor<ArrayList<SupplyRequest>> supplyRequestCaptor;
+
   @BeforeAll
   static void setupAll() {
     String mongoAddr = System.getenv().getOrDefault("MONGO_ADDR", "localhost");
@@ -932,5 +935,143 @@ class SupplyRequestControllerSpec {
 
     verify(ctx).json(any());
     verify(ctx).status(HttpStatus.OK);
+  }
+
+  /**
+   * Test filtering by item case-insensitively.
+   * Filtering for "PENCIL" should match "pencil" items.
+   */
+  @Test
+  void canGetSupplyNeedsFilteredByItemCaseInsensitive() throws IOException {
+    String targetItem = "PENCIL";
+
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(SupplyRequestController.ITEM_KEY, Arrays.asList(targetItem));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParam(SupplyRequestController.ITEM_KEY)).thenReturn(targetItem);
+
+    supplyRequestController.calculateNeed(ctx);
+
+    verify(ctx).json(supplyNeedContributionCaptor.capture());
+    verify(ctx).status(HttpStatus.OK);
+
+    ArrayList<SupplyNeedContribution> needs = supplyNeedContributionCaptor.getValue();
+    assertEquals(3, needs.size());
+
+    for (SupplyNeedContribution need : needs) {
+      assertEquals("pencil", need.item.toLowerCase());
+    }
+  }
+
+  /**
+   * Test filtering by properties case-insensitively.
+   * Properties with different cases should still match.
+   */
+  @Test
+  void canGetSupplyNeedsFilteredByPropertiesCaseInsensitive() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    List<String> properties = Arrays.asList("#2");
+    queryParams.put(SupplyRequestController.PROPERTIES_KEY, properties);
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParams(SupplyRequestController.PROPERTIES_KEY)).thenReturn(properties);
+
+    supplyRequestController.calculateNeed(ctx);
+
+    verify(ctx).json(supplyNeedContributionCaptor.capture());
+    verify(ctx).status(HttpStatus.OK);
+
+    ArrayList<SupplyNeedContribution> needs = supplyNeedContributionCaptor.getValue();
+    assertEquals(3, needs.size());
+
+    for (SupplyNeedContribution need : needs) {
+      assertTrue(need.properties != null);
+      boolean has2 = Arrays.stream(need.properties)
+        .anyMatch(prop -> prop.equalsIgnoreCase("#2"));
+      assertTrue(has2);
+    }
+  }
+
+  /**
+   * Test that invalid grade throws BadRequestResponse.
+   */
+  @Test
+  void getSupplyNeedsWithInvalidGradeThrowsBadRequestResponse() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(SupplyRequestController.GRADE_KEY, Arrays.asList("banana"));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParamAsClass(SupplyRequestController.GRADE_KEY, String.class))
+      .thenThrow(new BadRequestResponse("To find a supply request associated with a grade, use a valid grade option"));
+
+    assertThrows(BadRequestResponse.class, () -> {
+      supplyRequestController.calculateNeed(ctx);
+    });
+  }
+
+  /**
+   * Test that grouped needs filtering by item is case-insensitive.
+   */
+  @Test
+  void canGetGroupedSupplyNeedsFilteredByItemCaseInsensitive() throws IOException {
+    String targetItem = "PENCIL";
+
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(SupplyRequestController.ITEM_KEY, Arrays.asList(targetItem));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParam(SupplyRequestController.ITEM_KEY)).thenReturn(targetItem);
+
+    supplyRequestController.calculateNeedGrouped(ctx);
+
+    verify(ctx).json(supplyNeedGroupCaptor.capture());
+    verify(ctx).status(HttpStatus.OK);
+
+    ArrayList<SupplyNeedGroup> groupedNeeds = supplyNeedGroupCaptor.getValue();
+    assertTrue(groupedNeeds.size() > 0);
+
+    for (SupplyNeedGroup group : groupedNeeds) {
+      assertEquals("pencil", group.item.toLowerCase());
+    }
+  }
+
+  /**
+   * Test that grouped needs with invalid grade throws BadRequestResponse.
+   */
+  @Test
+  void getGroupedSupplyNeedsWithInvalidGradeThrowsBadRequestResponse() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(SupplyRequestController.GRADE_KEY, Arrays.asList("99"));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParamAsClass(SupplyRequestController.GRADE_KEY, String.class))
+      .thenThrow(new BadRequestResponse("To find a supply request associated with a grade, use a valid grade option"));
+
+    assertThrows(BadRequestResponse.class, () -> {
+      supplyRequestController.calculateNeedGrouped(ctx);
+    });
+  }
+
+  /**
+   * Test filtering supply requests by item case-insensitively on getSupplyRequests.
+   */
+  @Test
+  void canFilterSupplyRequestsByItemCaseInsensitiveOnGetRequests() throws IOException {
+    String targetItem = "PENCIL";
+
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put(SupplyRequestController.ITEM_KEY, Arrays.asList(targetItem));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    when(ctx.queryParam(SupplyRequestController.ITEM_KEY)).thenReturn(targetItem);
+    when(ctx.queryParam("sortby")).thenReturn(null);
+    when(ctx.queryParam("sortorder")).thenReturn(null);
+
+    supplyRequestController.getSupplyRequests(ctx);
+
+    verify(ctx).json(supplyRequestCaptor.capture());
+    verify(ctx).status(HttpStatus.OK);
+
+    ArrayList<SupplyRequest> supplyRequests = supplyRequestCaptor.getValue();
+    assertEquals(3, supplyRequests.size());
+
+    for (SupplyRequest request : supplyRequests) {
+      assertEquals("pencil", request.item.toLowerCase());
+    }
   }
 }
