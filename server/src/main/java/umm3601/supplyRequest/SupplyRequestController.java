@@ -193,7 +193,7 @@ public class SupplyRequestController implements Controller {
 
     List<Bson> pipeline = Arrays.asList(
       // Stage 1: Filter supply requests using any supported query params (school, grade, item, properties).
-      Aggregates.match(itemFilter(ctx)),
+      Aggregates.match(constructItemFilter(ctx)),
       // Stage 2: Filter out supply requests with missing or null item field.
       // This ensures we only process valid supply requests that have an item specified.
       new Document("$match", new Document("item", new Document("$exists", true).append("$ne", null))),
@@ -264,7 +264,7 @@ public class SupplyRequestController implements Controller {
 
     List<Bson> pipeline = Arrays.asList(
       // Stage 1: Filter supply requests using any supported query params (school, grade, item, properties).
-      Aggregates.match(itemFilter(ctx)),
+      Aggregates.match(constructItemFilter(ctx)),
       // Stage 2: Filter out supply requests with missing or null item field.
       // This ensures we only process valid supply requests that have an item specified.
       new Document("$match", new Document("item", new Document("$exists", true).append("$ne", null))),
@@ -351,7 +351,7 @@ public class SupplyRequestController implements Controller {
    * @return a Bson filter document that can be used in the `find` method
    *   to filter the database collection of supplyRequests
    */
-  private Bson itemFilter(Context ctx) {
+  private Bson constructItemFilter(Context ctx) {
     List<Bson> filters = new ArrayList<>(); // start with an empty list of filters
 
     if (ctx.queryParamMap().containsKey(SCHOOL_KEY)) {

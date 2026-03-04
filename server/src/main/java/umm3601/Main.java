@@ -3,6 +3,7 @@ package umm3601;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 
+import umm3601.supply.SupplyController;
 import umm3601.supplyRequest.SupplyRequestController;
 import umm3601.user.UserController;
 
@@ -62,6 +63,7 @@ public class Main {
       //
       // You can also remove this UserController once you don't need it.
       new UserController(database),
+      new SupplyController(database),
       new SupplyRequestController(database)
     };
     return controllers;
